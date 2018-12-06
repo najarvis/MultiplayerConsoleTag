@@ -22,6 +22,7 @@ valid_commands = ['JOIN', 'INFO',
 
 class GameHandler(object):
 	"""The GameHandler will mostly be used as a singleton to keep track of everything and run the game."""
+	# TODO: Thread that runs and updates the game.
 
 	def __init__(self):
 		self.new_game(False)
@@ -138,6 +139,7 @@ def send_game_help():
 	return data
 
 def parse_msg(msg, conn):
+	"""On recieving a message from a connection, this method parses it and returns what the response should be"""
 	try:
 		addr = "{}:{}".format(*conn.getpeername())
 		print(addr)
@@ -150,7 +152,7 @@ def parse_msg(msg, conn):
 		command = command.upper()
 		if command == 'QUIT':
 			GLOBAL_GAME_HANDLER.kick_player(addr)
-			return '<QUIT>'
+			return '<QUIT>' # Special value
 		if command == 'INFO':
 			return send_game_help()
 		elif command == 'JOIN':
@@ -168,15 +170,15 @@ def parse_msg(msg, conn):
 		raise(err)
 		return "SERVER ERROR, PLEASE TRY AGAIN AT A LATER TIME"
 
-
-# Print the board out in a human-friendly view
 def display_board():
+	"""Print the board out in a human-friendly view"""
 	print("-" * (2 * W + 1))
 	for row in board:
 		print("|" + " ".join(row) + "|")
 	print("-" * (2 * W + 1))
 
 def handle_client(conn):
+	"""The function that gets run by a thread each time a new user connects."""
 	with conn:
 		done = False
 
